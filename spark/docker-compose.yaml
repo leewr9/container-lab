@@ -46,6 +46,7 @@ x-spark-common:
     PYSPARK_PYTHON: /usr/bin/python3
     SPARK_HOME: /opt/spark
     SPARK_NO_DAEMONIZE: 'true'
+    SPARK_MASTER_HOST: spark-master
     PATH: '/opt/spark/bin:/opt/spark/sbin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
   working_dir: /opt/spark
   volumes:
@@ -66,8 +67,6 @@ services:
       - "8080:8080"
       - "4040:4040"
       - "7077:7077"
-    stdin_open: true
-    tty: true
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
