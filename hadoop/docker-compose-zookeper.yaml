@@ -1,0 +1,112 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+x-hadoop-common:
+  &hadoop-common
+  build:
+    context: zookeeper
+    dockerfile: Dockerfile
+  image: hadoop-zookeeper:latest
+  environment:
+    &hadoop-common-env
+    YARN_CONF_DIR: /opt/hadoop/etc/hadoop
+  working_dir: /opt/hadoop
+  volumes:
+    - ${HADOOP_PROJ_DIR:-.}/jobs:/opt/hadoop/jobs
+    - ${HADOOP_PROJ_DIR:-.}/logs:/opt/hadoop/logs
+    - ${HADOOP_PROJ_DIR:-.}/config:/opt/hadoop/config
+    - ${HADOOP_PROJ_DIR:-.}/plugins:/opt/hadoop/plugins
+  user: "${HADOOP_UID:-hadoop}:0"
+
+services:
+  namenode:
+    <<: *hadoop-common
+    command: namenode
+    hostname: namenode
+    ports:
+      - "50070:50070"
+      - "8088:8088"
+      - "19888:19888"
+      - "8080:8080"
+    environment:
+      <<: *hadoop-common-env
+      HADOOP_MODE: "namenode"
+      ZOOKEEPER_MY_ID: "1"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  namenode-2:
+    <<: *hadoop-common
+    command: namenode-2
+    hostname: namenode-2
+    environment:
+      <<: *hadoop-common-env
+      HADOOP_MODE: "standby"
+      ZOOKEEPER_MY_ID: "2"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      
+  datanode:
+    <<: *hadoop-common
+    command: datanode
+    hostname: datanode
+    ports:
+      - "8042:8042"
+    environment:
+      <<: *hadoop-common-env
+      HADOOP_MODE: "datanode"
+      ZOOKEEPER_MY_ID: "3"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  datanode-2:
+    <<: *hadoop-common
+    command: datanode-2
+    hostname: datanode-2
+    environment:
+      <<: *hadoop-common-env
+      HADOOP_MODE: "datanode"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  datanode-3:
+    <<: *hadoop-common
+    command: datanode-3
+    hostname: datanode-3
+    environment:
+      <<: *hadoop-common-env
+      HADOOP_MODE: "datanode"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  init:
+    <<: *hadoop-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /sources/jobs /sources/logs /sources/plugins
+        chown -R "${HADOOP_UID}:0" /sources/{jobs,logs,plugins}
+        hdfs version
+    user: "0:0"
+    volumes:
+      - ${HADOOP_PROJ_DIR:-.}:/sources

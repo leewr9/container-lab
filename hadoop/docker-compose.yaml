@@ -1,0 +1,43 @@
+---
+x-hadoop-common:
+  &hadoop-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: hadoop:latest
+  environment:
+    &hadoop-common-env
+    YARN_CONF_DIR: /opt/hadoop/etc/hadoop
+  working_dir: /opt/hadoop
+  volumes:
+    - ${HADOOP_PROJ_DIR:-.}/jobs:/opt/hadoop/jobs
+    - ${HADOOP_PROJ_DIR:-.}/logs:/opt/hadoop/logs
+    - ${HADOOP_PROJ_DIR:-.}/config:/opt/hadoop/config
+    - ${HADOOP_PROJ_DIR:-.}/plugins:/opt/hadoop/plugins
+  user: "${HADOOP_UID:-hadoop}:0"
+
+services:
+  hadoop:
+    <<: *hadoop-common
+    command: standalone
+    ports:
+      - "50070:50070"
+      - "8088:8088"
+      - "19888:19888"
+      - "8080:8080"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  init:
+    <<: *hadoop-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /sources/jobs /sources/logs /sources/plugins
+        chown -R "${HADOOP_UID}:0" /sources/{jobs,logs,plugins}
+        hdfs version
+    user: "0:0"
+    volumes:
+      - ${HADOOP_PROJ_DIR:-.}:/sources
