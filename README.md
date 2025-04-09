@@ -5,7 +5,7 @@ This repository is dedicated to learning and practicing Docker and Docker Compos
 ## Usage  
 1. **Clone the repository:**  
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/leewr9/learning-docker.git
    cd learning-docker
    ```  
 2. **Navigate to the desired folder:**  
@@ -22,4 +22,4 @@ This repository is dedicated to learning and practicing Docker and Docker Compos
    ```  
 
 ## License  
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.  
