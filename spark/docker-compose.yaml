@@ -1,15 +1,13 @@
 ---
-x-spark-common:
-  &spark-common
+x-spark-common: &spark-common
   image: ${SPARK_IMAGE_NAME:-apache/spark:3.5.4}
-  environment:
-    &spark-common-env
+  environment: &spark-common-env
     PYSPARK_PYTHON: /usr/bin/python3
     PYSPARK_DRIVER_PYTHON: /usr/bin/python3
     SPARK_HOME: /opt/spark
-    SPARK_NO_DAEMONIZE: 'true'
+    SPARK_NO_DAEMONIZE: "true"
     SPARK_MASTER_HOST: spark-master
-    PATH: '/opt/spark/bin:/opt/spark/sbin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+    PATH: "/opt/spark/bin:/opt/spark/sbin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   working_dir: /opt/spark
   volumes:
     - ${SPARK_PROJ_DIR:-.}/work-dir:/home/spark

@@ -10,14 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
 ---
-x-hadoop-common:
-  &hadoop-common
+x-hadoop-common: &hadoop-common
   build:
     context: zookeeper
     dockerfile: Dockerfile
   image: hadoop-zookeeper:latest
-  environment:
-    &hadoop-common-env
+  environment: &hadoop-common-env
     YARN_CONF_DIR: /opt/hadoop/etc/hadoop
   working_dir: /opt/hadoop
   volumes:
@@ -56,7 +54,7 @@ services:
     depends_on:
       init:
         condition: service_completed_successfully
-      
+
   datanode:
     <<: *hadoop-common
     command: datanode

@@ -10,14 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
 ---
-x-hadoop-common:
-  &hadoop-common
+x-hadoop-common: &hadoop-common
   build:
     context: .
     dockerfile: Dockerfile
   image: hadoop:latest
-  environment:
-    &hadoop-common-env
+  environment: &hadoop-common-env
     YARN_CONF_DIR: /opt/hadoop/etc/hadoop
   working_dir: /opt/hadoop
   volumes:
