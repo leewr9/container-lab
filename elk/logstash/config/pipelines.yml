@@ -1,0 +1,5 @@
+- pipeline.id: apache_nginx_pipeline
+  path.config: "/usr/share/logstash/pipeline/apache_nginx.conf"
+
+- pipeline.id: app_log_pipeline
+  path.config: "/usr/share/logstash/pipeline/app_logs.conf"

@@ -1,0 +1,17 @@
+filebeat.inputs:
+  - type: log
+    paths:
+      - /usr/share/logs/access_*.log
+    fields:
+      log_type: apache_access
+    fields_under_root: true
+
+  - type: log
+    paths:
+      - /usr/share/logs/error_*.log
+    fields:
+      log_type: apache_error
+    fields_under_root: true
+
+output.logstash:
+  hosts: ["logstash:5044"]
