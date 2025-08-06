@@ -1,3 +1,24 @@
+# MIT License
+#
+# Copyright (c) 2025 Rooam Lee
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 ---
 x-airflow-common: &airflow-common
   image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.5}
@@ -28,6 +49,7 @@ x-airflow-common: &airflow-common
 services:
   postgres:
     image: postgres:13
+    hostname: postgres
     environment:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
@@ -43,6 +65,7 @@ services:
 
   redis:
     image: redis:7.2-bookworm
+    hostname: redis
     expose:
       - 6379
     healthcheck:
@@ -56,6 +79,7 @@ services:
   webserver:
     <<: *airflow-common
     command: webserver
+    hostname: webserver
     ports:
       - "8080:8080"
     healthcheck:
@@ -73,6 +97,7 @@ services:
   scheduler:
     <<: *airflow-common
     command: scheduler
+    hostname: scheduler
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
@@ -88,6 +113,7 @@ services:
   worker:
     <<: *airflow-common
     command: celery worker
+    hostname: worker
     healthcheck:
       test:
         - "CMD-SHELL"
@@ -108,12 +134,33 @@ services:
   triggerer:
     <<: *airflow-common
     command: triggerer
+    hostname: triggerer
     healthcheck:
       test:
         [
           "CMD-SHELL",
           'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"',
         ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      init:
+        condition: service_completed_successfully
+
+  flower:
+    <<: *airflow-common
+    command: celery flower
+    hostname: flower
+    profiles:
+      - flower
+    ports:
+      - "5555:5555"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -143,25 +190,6 @@ services:
     user: "0:0"
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
-
-  flower:
-    <<: *airflow-common
-    command: celery flower
-    profiles:
-      - flower
-    ports:
-      - "5555:5555"
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    restart: always
-    depends_on:
-      <<: *airflow-common-depends-on
-      init:
-        condition: service_completed_successfully
 
 volumes:
   postgres-db-volume:
