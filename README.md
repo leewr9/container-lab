@@ -1,14 +1,13 @@
-# Learning Docker
+# Container Lab
 
-This repository is dedicated to learning and practicing Docker and Docker Compose.
-It contains various development environments and services organized into separate folders, each with Docker Compose configurations, example code, and usage instructions.
+This repository is dedicated to learning and practicing container technologies like Docker and Kubernetes. It includes Dockerfiles, Kubernetes manifests, and example configurations organized for easy experimentation and development.
 
 ## Feature
 
-- Practice various Docker and Docker Compose setups
-- Modular folders for isolated environments and examples
-- Simple docker-compose commands to spin up services quickly
-- Hands-on learning for building and managing containers
+- Practice **Docker**, **Docker Compose**, and **Kubernetes (k8s)** setups
+- Modular folders for isolated container and cluster environments
+- Quick start with simple Docker Compose and kubectl commands
+- Hands-on learning for building, deploying, and managing containers and clusters
 
 ## Installation
 
@@ -19,24 +18,46 @@ cd learning-docker
 
 ## Usage
 
-### Navigate to the Desired Folder
-
 Choose a service or environment you want to practice with:
 
 ```bash
 cd <folder-name>
 ```
 
-### Start the Docker Environment
+###  Docker
 
 ```bash
-docker-compose up -d
+# Build Docker image from Dockerfile in current folder
+docker build -t <image-name> .
+
+# Run container in detached mode with a specific name
+docker run -d --name <container-name> <image-name>
+
+# Stop the running container
+docker stop <container-name>
+
+# Remove the stopped container
+docker rm <container-name>
 ```
 
-### Stop the Docker Environment
+###  Docker Compose
 
 ```bash
+# Start services defined in docker-compose.yml in detached mode
+docker-compose up -d
+
+# Stop and remove containers, networks defined in docker-compose.yml
 docker-compose down
+```
+
+### Kubernetes (k8s)
+
+```bash
+# Apply all Kubernetes manifests in current directory
+kubectl apply -f .
+
+# Delete all Kubernetes resources defined in current directory
+kubectl delete -f .
 ```
 
 ## License
