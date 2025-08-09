@@ -38,7 +38,6 @@ x-hadoop-common: &hadoop-common
 services:
   namenode:
     <<: *hadoop-common
-    command: namenode
     hostname: namenode
     ports:
       - "50070:50070"
@@ -55,7 +54,6 @@ services:
 
   namenode-2:
     <<: *hadoop-common
-    command: namenode-2
     hostname: namenode-2
     environment:
       <<: *hadoop-common-env
@@ -67,7 +65,6 @@ services:
 
   datanode:
     <<: *hadoop-common
-    command: datanode
     hostname: datanode
     ports:
       - "8042:8042"
@@ -81,7 +78,6 @@ services:
 
   datanode-2:
     <<: *hadoop-common
-    command: datanode-2
     hostname: datanode-2
     environment:
       <<: *hadoop-common-env
@@ -92,7 +88,6 @@ services:
 
   datanode-3:
     <<: *hadoop-common
-    command: datanode-3
     hostname: datanode-3
     environment:
       <<: *hadoop-common-env

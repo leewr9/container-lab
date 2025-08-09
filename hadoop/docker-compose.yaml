@@ -38,7 +38,6 @@ x-hadoop-common: &hadoop-common
 services:
   hadoop:
     <<: *hadoop-common
-    command: standalone
     ports:
       - "50070:50070"
       - "8088:8088"
